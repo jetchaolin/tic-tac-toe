@@ -63,6 +63,7 @@ body {
 
 ol {
   padding: 10px;
+  margin-top: 2px;
 }
 
 li {
@@ -89,6 +90,21 @@ p {
   width: 34px;
 }
 
+.winner-square {
+  background: #ffd380;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+
 .board-row:after {
   clear: both;
   content: '';
@@ -96,9 +112,19 @@ p {
 }
 
 .status {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
   color: #fff;
 }
+
+.winner-status {
+  font-weight: 600;
+  background-color: #ffd380;
+  margin-bottom: 10px;
+  color: #fff;
+  border: solid #ffd380;
+  border-radius: 5%;
+}
+
 .game {
   display: flex;
   flex-direction: row;
@@ -106,6 +132,7 @@ p {
 
 .game-info {
   margin-left: 20px;
+  align-items: center;
 }
 
 .history {
@@ -114,4 +141,8 @@ p {
   background-color: #b40000;
   border: solid 1px #000000;
   border-radius: 5px;
+}
+
+.toggle {
+  margin-left: 10px;
 }

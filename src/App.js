@@ -1,14 +1,18 @@
 import { useState } from 'react';
 
-function Square({ value, onSquareClick }) {
-  return <button className="square" onClick={onSquareClick}>
-    {value}
-  </button>;
+function Square({ valueSquares, valueIndex, onSquareClick, hightLight }) {
+  const teste = hightLight.positions.includes(valueIndex);
+
+  return (
+    <button className={teste ? "winner-square" : "square"} onClick={onSquareClick}>
+      {valueSquares[valueIndex]}
+    </button>
+  );
 }
 
-function Board({ xIsNext, squares, onPlay }) {
-  function handleClick(i){
-    if (squares[i] || calculateWinner(squares)) {
+function Board({ xIsNext, squares, onPlay, currentMove }) {
+    function handleClick(i){
+    if (squares[i] || calculateWinner(squares).winner || currentMove > 8) {
       return;
     }
 
@@ -20,21 +24,24 @@ function Board({ xIsNext, squares, onPlay }) {
     }
     onPlay(nextSquares);
   }
-
-  const winner = calculateWinner(squares);
+  
+  const winner = calculateWinner(squares); 
   let status;
-  if (winner) {
-    status = "Winner: " + winner;
+  if (winner.winner) {
+    status = "Winner: " + winner.winner;
+  } else if (currentMove > 8) {
+    status = "Draw";
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
-
   const loopBoard = squares.slice();  
   const boardLines = loopBoard.map((element, index) => {
     return (
-      <Square 
-        value={squares[index]} 
-        onSquareClick={() => handleClick(index)} 
+      <Square key={index} 
+        valueSquares={squares}
+        valueIndex={index}
+        onSquareClick={() => handleClick(index)}
+        hightLight={calculateWinner(squares)} 
       />
     );
   });  
@@ -55,7 +62,7 @@ function Board({ xIsNext, squares, onPlay }) {
   const calculo = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
   const drawBoard = calculo.map((element) => {
     return (
-      <div className="board-row">
+      <div key={element} className="board-row">
         {drawLine(element)}
       </div>  
     );    
@@ -63,7 +70,7 @@ function Board({ xIsNext, squares, onPlay }) {
 
   return (
     <>
-      <div className="status">{status}</div>
+      <div className={status === "Winner: " + winner.winner ? "winner-status" : "status"}>{status}</div>
         {drawBoard}
     </>
   );
@@ -76,7 +83,8 @@ export default function Game() {
   const [isAscend, setIsAscend] = useState(true);
   const xIsNext = currentMove % 2 === 0
   const currentSquares = history[currentMove];
-  const swapDescription = (isAscend ? "Descending" : "Ascending");
+  const swapDescription = (isAscend ? "Ascending ⩓" : "Descending ⩔");
+  const winnerTest = {name: null, p1: null, p2: null, p3: null};
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -98,7 +106,7 @@ export default function Game() {
   }
 
   const moves = history.map((squares, move) => {
-        let description;
+    let description;
     if (move === currentMove ) {
       description = 'You are at move #' + move;
     } if (move > 0 && move != currentMove) {
@@ -121,18 +129,18 @@ export default function Game() {
         </li>
       );}
   });
-  console.log(moves)
 
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} currentMove={currentMove} />
       </div>
       <div className="game-info">
+      <button className="toggle" onClick={swap}>{swapDescription}</button>
         <ol>{(isAscend ? moves : moves.toReversed())}</ol>
       </div>
       <div>
-        <button onClick={swap}>{swapDescription}</button>
+        
       </div>
     </div>
   );
@@ -153,8 +161,8 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {winner: squares[a], positions: [a, b, c]};
     }
   }
-  return null;
+  return {winner: null, positions: []};
 }
