@@ -58,6 +58,7 @@ body {
   font-family: sans-serif;
   margin: 20px;
   padding: 0;
+  padding-left: 40%;
   color:#fff;
 }
 
@@ -77,32 +78,33 @@ p {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 2px solid #3e3e3e;
   float: left;
-  font-size: 24px;
+  font-size: 34px;
   font-weight: bold;
   line-height: 34px;
-  height: 34px;
+  height: 78px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 34px;
+  width: 78px;
 }
 
 .winner-square {
   background: #ffd380;
-  border: 1px solid #999;
+  border: 2px solid #ffeb78;
   float: left;
-  font-size: 24px;
+  font-size: 34px;
   font-weight: bold;
+  color: #fff;
   line-height: 34px;
-  height: 34px;
+  height: 78px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 34px;
+  width: 78px;
 }
 
 .board-row:after {
@@ -112,11 +114,13 @@ p {
 }
 
 .status {
+  padding-left: 70px;
   margin-bottom: 16px;
   color: #fff;
 }
 
 .winner-status {
+  padding-left: 70px;
   font-weight: 600;
   background-color: #ffd380;
   margin-bottom: 10px;
@@ -145,4 +149,23 @@ p {
 
 .toggle {
   margin-left: 10px;
+}
+
+.history-square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 8px;
+  height: 35px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 35px;
+}
+
+.history-board {
+  padding: 65px;
 }

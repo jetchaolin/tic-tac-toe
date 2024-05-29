@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 function Square({ valueSquares, valueIndex, onSquareClick, hightLight }) {
   const teste = hightLight.positions.includes(valueIndex);
-
+  
   return (
     <button className={teste ? "winner-square" : "square"} onClick={onSquareClick}>
       {valueSquares[valueIndex]}
@@ -10,19 +10,67 @@ function Square({ valueSquares, valueIndex, onSquareClick, hightLight }) {
   );
 }
 
-function Board({ xIsNext, squares, onPlay, currentMove }) {
-    function handleClick(i){
-    if (squares[i] || calculateWinner(squares).winner || currentMove > 8) {
-      return;
-    }
+function HistorySquare({ valueSquares }) {
+  const littleNumber = {0: '°', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹'}
+  let drawPlay;
+  if (valueSquares.player) {
+    drawPlay = valueSquares.player + littleNumber[valueSquares.turn];
+  } else {
+    drawPlay = valueSquares.player;
+  }
 
-    const nextSquares = squares.slice();
-    if (xIsNext) {
-      nextSquares[i] = "X";
-    } else {
-      nextSquares[i] = "O";
-    }
-    onPlay(nextSquares);
+  return (
+    <button className='history-square'>
+      {drawPlay}
+    </button>
+  );
+}
+
+function HistoryBoard({ historySquaresProp }) {
+  const loopHistoryBoard = historySquaresProp.slice();  
+  const historyBoardLines = loopHistoryBoard.map((element, index) => {
+    return (
+      <HistorySquare key={index} 
+        valueSquares={element} 
+        valueIndex={index} 
+      />
+    );
+  }); 
+
+  const drawHistoryLine = (element) => {
+    return element.map((number) => historyBoardLines[number])
+  }
+
+  const calculo = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
+  const drawHistoryBoard = calculo.map((element) => {
+    return (
+      <div key={element} className="board-row">
+        {drawHistoryLine(element)}
+      </div>  
+    );    
+  });  
+
+  return (
+    <>
+        {drawHistoryBoard}
+    </>
+  );
+}
+
+function Board({ xIsNext, squares, onPlay, currentMove, onHistory }) {
+    function handleClick(i){
+      if (squares[i] || calculateWinner(squares).winner || currentMove > 8) {
+        return;
+      }    
+
+      const nextSquares = squares.slice();
+      if (xIsNext) {
+        nextSquares[i] = "X";
+      } else {
+        nextSquares[i] = "O";
+      }
+      onPlay(nextSquares);
+      onHistory(i);
   }
   
   const winner = calculateWinner(squares); 
@@ -40,20 +88,11 @@ function Board({ xIsNext, squares, onPlay, currentMove }) {
       <Square key={index} 
         valueSquares={squares}
         valueIndex={index}
-        onSquareClick={() => handleClick(index)}
+        onSquareClick={() => handleClick(index)} 
         hightLight={calculateWinner(squares)} 
       />
     );
   });  
-
-  // EXEMPLOS!
-  // const tentandoEntender = (element) => {
-  //   return aaah.map((arrayN) => {
-  //     return boardLines[arrayN]
-  //   })
-  // }
-
-  // const tentandoEntenderTres = (aaah) => aaah.map((arrayN) => boardLines[arrayN])
 
   const drawLine = (element) => {
     return element.map((number) => boardLines[number])
@@ -81,19 +120,31 @@ export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [isAscend, setIsAscend] = useState(true);
+  const [formatHistory, setFormatHistory] = useState([Array(9).fill({player: null, turn: null})])
   const xIsNext = currentMove % 2 === 0
   const currentSquares = history[currentMove];
+  const currentHistorySquares = formatHistory[currentMove];
   const swapDescription = (isAscend ? "Ascending ⩓" : "Descending ⩔");
-  const winnerTest = {name: null, p1: null, p2: null, p3: null};
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
 
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-
   }
 
+  function handleHistory(i) {
+    const nextSquaresHistory = currentHistorySquares.slice();
+    if (xIsNext) {
+      nextSquaresHistory[i] = {player: "X", turn: (currentMove + 1)};
+    } else {
+      nextSquaresHistory[i] = {player: "O", turn: (currentMove + 1) };
+    }  
+
+    const nextFormatHistory = [...formatHistory.slice(0, currentMove + 1), nextSquaresHistory];
+    setFormatHistory(nextFormatHistory);
+  }
+  
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
@@ -133,14 +184,19 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} currentMove={currentMove} />
+        <Board xIsNext={xIsNext}
+         squares={currentSquares}
+         onPlay={handlePlay}
+         onHistory={handleHistory} 
+         currentMove={currentMove} 
+        />
+        <div className='history-board'>
+          <HistoryBoard historySquaresProp={currentHistorySquares} />
+        </div>
       </div>
       <div className="game-info">
       <button className="toggle" onClick={swap}>{swapDescription}</button>
         <ol>{(isAscend ? moves : moves.toReversed())}</ol>
-      </div>
-      <div>
-        
       </div>
     </div>
   );
